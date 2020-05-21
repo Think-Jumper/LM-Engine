@@ -47,8 +47,8 @@ character_movement::character_movement(lmng::simulation_init const &init)
       swing_arms_animation{animation_system.load_animation(
         YAML::LoadFile((init.project_dir / "swing_arms.lmanim").string()))}
 {
-    init.registry.assign<lmng::transform>(camera);
-    init.registry.assign<lmng::camera>(camera, 1.1f, 0.1f, 1000.f, true);
+    init.registry.emplace<lmng::transform>(camera);
+    init.registry.emplace<lmng::camera>(camera, 1.1f, 0.1f, 1000.f, true);
 }
 
 void character_movement::handle_input_event(

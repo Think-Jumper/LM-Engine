@@ -60,7 +60,7 @@ void deserialise(YAML::Node const &yaml, entt::registry &registry)
 
         auto name = actor_yaml.first.as<std::string>();
 
-        registry.assign<lmng::name>(new_entity, name);
+        registry.emplace<lmng::name>(new_entity, name);
 
         name_map.emplace(name, new_entity);
     }
@@ -71,7 +71,7 @@ void deserialise(YAML::Node const &yaml, entt::registry &registry)
 
         for (auto const &component_yaml : actor_yaml.second)
         {
-            lmng::assign_to_entity(
+            emplace_on_entity(
               deserialise_component(
                 registry, component_yaml.first, component_yaml.second),
               registry,
@@ -86,7 +86,7 @@ entt::meta_any deserialise_component(
   YAML::Node const &component_yaml)
 {
     auto component_meta_type =
-      entt::resolve(entt::hashed_string{component_type_name.c_str()});
+      entt::resolve_id(entt::hashed_string{component_type_name.c_str()});
 
     auto component = component_meta_type.ctor().invoke();
 

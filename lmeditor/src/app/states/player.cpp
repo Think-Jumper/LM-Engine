@@ -1,4 +1,5 @@
 #include "../app.h"
+#include <lmengine/registry.h>
 #include <lmlib/camera.h>
 #include <lmlib/variant_visitor.h>
 
@@ -6,7 +7,7 @@ namespace lmeditor
 {
 editor_app::player_state editor_app::create_player_state()
 {
-    auto play_registry = map.clone();
+    auto play_registry = lmng::clone(map);
     auto simulation = create_simulation(
       simulation_names[selected_simulation_index],
       lmng::simulation_init{play_registry, project_dir});

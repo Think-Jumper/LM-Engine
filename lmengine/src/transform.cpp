@@ -47,7 +47,7 @@ void set_transform_parent(
     auto entity_transform = lmng::resolve_transform(registry, entity);
     auto parent_transform = lmng::resolve_transform(registry, parent);
 
-    registry.assign_or_replace<lmng::transform_parent>(
+    registry.emplace_or_replace<lmng::transform_parent>(
       entity, lmng::transform_parent{parent});
 
     registry.replace<lmng::transform>(

@@ -21,7 +21,7 @@ void set_data(
   std::string const &string,
   entt::registry const &context);
 
-void assign_to_entity(
+void emplace_on_entity(
   entt::meta_any const &component,
   entt::registry &registry,
   entt::entity entity);
@@ -77,7 +77,7 @@ class any_component
 
     any_component &assign(entt::registry &registry, entt::entity entity)
     {
-        assign_to_entity(any, registry, entity);
+        emplace_on_entity(any, registry, entity);
         return *this;
     }
 
@@ -111,12 +111,12 @@ void reflect_components(
 }
 
 template <typename component_type>
-void assign_to_entity(
+void emplace_on_entity(
   void const *component,
   entt::registry *registry,
   entt::entity entity)
 {
-    registry->assign<component_type>(
+    registry->emplace<component_type>(
       entity, *static_cast<component_type const *>(component));
 }
 
@@ -126,15 +126,30 @@ void replace_on_entity(
   entt::registry *registry,
   entt::entity entity)
 {
-    registry->replace<component_type>(
-      entity, *static_cast<component_type const *>(component));
+    if constexpr (std::is_empty_v<component_type>)
+    {
+        registry->replace<component_type>(entity);
+    }
+    else
+    {
+        registry->replace<component_type>(
+          entity, *static_cast<component_type const *>(component));
+    }
+    return;
 }
 
 template <typename component_type>
 component_type
   get_from_entity(entt::registry const *registry, entt::entity entity)
 {
-    return registry->get<component_type>(entity);
+    if constexpr (std::is_empty_v<component_type>)
+    {
+        return component_type{};
+    }
+    else
+    {
+        return registry->get<component_type>(entity);
+    }
 }
 
 template <typename component_type>
@@ -239,11 +254,21 @@ std::string getter(void const *component, entt::registry const *context)
 template <typename component_type>
 void clone(entt::registry const *from, entt::registry *to)
 {
-    from->view<component_type const>().each(
-      [&](auto entity, auto const &component) {
-          to->assign<component_type>(entity, component);
-      });
+    if constexpr (std::is_empty_v<component_type>)
+    {
+        from->view<component_type const>().each(
+          [&](auto entity) { to->emplace<component_type>(entity); });
+    }
+    else
+    {
+        from->view<component_type const>().each(
+          [&](auto entity, auto const &component) {
+              to->emplace<component_type>(entity, component);
+          });
+    }
 }
+
+bool is_component_type(entt::meta_type const &meta_type);
 
 char const *get_type_name(entt::meta_type const &type);
 char const *get_data_name(entt::meta_data const &data);
@@ -262,11 +287,11 @@ void reflect_types();
 
 #define REFLECT_TYPE(_type, name)                                              \
     entt::meta<_type>()                                                        \
-      .alias(entt::hashed_string{name}.value())                                \
+      .type(entt::hashed_string{name}.value())                                 \
       .prop("name"_hs.value(), name)                                           \
       .prop(entt::hashed_string{"is_component"})                               \
       .ctor<&lmng::construct<_type>>()                                         \
-      .func<&lmng::assign_to_entity<_type>>("assign_to_entity"_hs)             \
+      .func<&lmng::emplace_on_entity<_type>>("emplace_on_entity"_hs)           \
       .func<&lmng::replace_on_entity<_type>>("replace_on_entity"_hs)           \
       .func<&lmng::get_from_entity<_type>>("get_from_entity"_hs)               \
       .func<&lmng::remove_from_entity<_type>>("remove_from_entity"_hs)         \

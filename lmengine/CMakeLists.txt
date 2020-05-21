@@ -13,16 +13,16 @@ add_library(
   lmengine
   SHARED
 
-  src/reflection.cpp
-  src/serialisation.cpp
-  src/bullet_physics/bullet_physics.cpp
-  src/bullet_physics/rigid_body.cpp
-  src/bullet_physics/character_controller.cpp
-  src/transform.cpp
-  src/name.cpp
-  src/pose.cpp
-  src/animation.cpp
-  src/extents.cpp ../lmeditor/include/lmeditor/component/saver.h)
+        src/reflection.cpp
+        src/serialisation.cpp
+        src/bullet_physics/bullet_physics.cpp
+        src/bullet_physics/rigid_body.cpp
+        src/bullet_physics/character_controller.cpp
+        src/transform.cpp
+        src/name.cpp
+        src/pose.cpp
+        src/animation.cpp
+        src/extents.cpp ../lmeditor/include/lmeditor/component/saver.h src/registry.cpp)
 
 target_include_directories(
   lmengine

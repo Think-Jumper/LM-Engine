@@ -15,19 +15,19 @@ TEST_CASE("Transform Hierarchy")
 
     entt::registry registry;
     auto parent = registry.create();
-    auto parent_transform = registry.assign<lmng::transform>(
+    auto parent_transform = registry.emplace<lmng::transform>(
       parent, parent_position, parent_rotation);
 
     auto child = registry.create();
     auto child_transform =
-      registry.assign<lmng::transform>(child, child_position, child_rotation);
+      registry.emplace<lmng::transform>(child, child_position, child_rotation);
 
     auto grandchild = registry.create();
-    auto grandchild_transform = registry.assign<lmng::transform>(
+    auto grandchild_transform = registry.emplace<lmng::transform>(
       grandchild, child_position, child_rotation);
 
-    registry.assign<lmng::transform_parent>(child, parent);
-    registry.assign<lmng::transform_parent>(grandchild, child);
+    registry.emplace<lmng::transform_parent>(child, parent);
+    registry.emplace<lmng::transform_parent>(grandchild, child);
 
     lmng::transform expected_transform{
       parent_transform.position +

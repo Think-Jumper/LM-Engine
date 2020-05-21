@@ -31,13 +31,13 @@ entt::meta_any get_component_any(
     return get_func.invoke({}, &registry, entity);
 }
 
-void assign_to_entity(
+void emplace_on_entity(
   entt::meta_any const &component,
   entt::registry &registry,
   entt::entity entity)
 {
     component.type()
-      .func("assign_to_entity"_hs)
+      .func("emplace_on_entity"_hs)
       .invoke({}, component.data(), &registry, entity);
 }
 
@@ -206,5 +206,10 @@ void reflect_types()
       .REFLECT_MEMBER(camera, near_clip, "Near clip")
       .REFLECT_MEMBER(camera, far_clip, "Far clip")
       .REFLECT_MEMBER(camera, active, "Active");
+}
+
+bool is_component_type(const entt::meta_type &meta_type)
+{
+    return meta_type.prop("is_component"_hs).operator bool();
 }
 } // namespace lmng

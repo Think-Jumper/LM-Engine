@@ -28,7 +28,7 @@ inspector::add_state inspector::create_add_state()
     std::vector<add_state::entry> entries;
     int height{32};
     int index{0};
-    entt::resolve([&](entt::meta_type const &component_type) {
+    entt::resolve_id([&](entt::meta_type const &component_type) {
         if (!component_type.prop(entt::hashed_string{"is_component"}))
             return;
 

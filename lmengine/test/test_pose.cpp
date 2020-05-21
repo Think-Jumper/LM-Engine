@@ -18,17 +18,16 @@ std::pair<entt::entity, std::array<entt::entity, 4>>
 
     registry.create(children.begin(), children.end());
 
-    registry.assign<lmng::name>(
-      children.begin(),
-      children.end(),
-      std::array<lmng::name, 4>{"1", "11", "111", "2"}.begin());
+    std::array<lmng::name, 4> names{"1", "11", "111", "2"};
 
-    registry.assign<lmng::transform_parent>(
-      children.begin(),
-      children.end(),
-      std::array<lmng::transform_parent, 4>{
-        parent, children[0], children[1], parent}
-        .begin());
+    registry.insert<lmng::name>(
+      children.begin(), children.end(), names.begin(), names.end());
+
+    std::array<lmng::transform_parent, 4> parents{
+      parent, children[0], children[1], parent};
+
+    registry.insert<lmng::transform_parent>(
+      children.begin(), children.end(), parents.begin(), parents.end());
 
     return {parent, children};
 };
@@ -46,8 +45,8 @@ TEST_CASE("Save/load pose")
       lmng::transform{{2.f, 0.f, 0.f}},
     };
 
-    registry.assign<lmng::transform>(
-      children.begin(), children.end(), transforms.begin());
+    registry.insert<lmng::transform>(
+      children.begin(), children.end(), transforms.begin(), transforms.end());
 
     auto yaml = lmng::save_pose(registry, parent);
 
@@ -55,11 +54,11 @@ TEST_CASE("Save/load pose")
 
     std::tie(parent, children) = create_test_hierarchy(registry);
 
-    registry.assign<lmng::transform>(children.begin(), children.end(), {});
+    registry.insert<lmng::transform>(children.begin(), children.end(), {});
 
     lmng::load_pose(registry, parent, yaml);
 
-    registry.assign<lmng::transform>(parent);
+    registry.emplace<lmng::transform>(parent);
 
     for (auto i : lm::range(4))
     {

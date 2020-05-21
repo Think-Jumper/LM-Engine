@@ -10,12 +10,15 @@ TEST_CASE("Visit transform children")
     std::array<entt::entity, 7> entities{entt::null};
 
     registry.create(entities.begin(), entities.end());
-    registry.assign<lmng::transform_parent>(
+
+    std::array<lmng::transform_parent, 5> parent_array{
+      entities[0], entities[1], entities[2], entities[0], entities[6]};
+
+    registry.insert<lmng::transform_parent>(
       entities.begin() + 1,
       entities.end() - 1,
-      std::array<lmng::transform_parent, 5>{
-        entities[0], entities[1], entities[2], entities[0], entities[6]}
-        .begin());
+      parent_array.begin(),
+      parent_array.end());
 
     std::array<bool, 7> visited{false};
 

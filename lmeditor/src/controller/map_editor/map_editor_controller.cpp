@@ -73,30 +73,52 @@ entt::entity map_editor_controller::add_cube(
     auto &rigid_body =
       map.assign<lmng::rigid_body>(new_cube, 1.f, 0.25f, 0.75f);
 
-    map.assign<lmng::name>(new_cube, get_unique_name(map, "Box"));
+    map.assign<lmng::name>(new_cube, get_unique_name(map, new_cube, "Box"));
 
     return new_cube;
 }
 
 std::string map_editor_controller::get_unique_name(
   entt::registry const &map,
-  char const *prefix)
+  entt::entity for_entity,
+  const std::string &name)
 {
-    std::string unique_name{prefix};
-
     unsigned postfix{0};
 
-    auto name_view = map.view<lmng::name const>();
+    std::string found_name{name};
 
-    while (auto found_existing = ranges::find_if(name_view, [&](auto entity) {
-                                     return name_view.get(entity).string ==
-                                            unique_name;
-                                 }) != name_view.end())
+    if (auto maybe_parent = map.try_get<lmng::transform_parent>(for_entity))
     {
-        unique_name = std::string{prefix} + std::to_string(++postfix);
+        while (true)
+        {
+            bool collides{false};
+
+            lmng::visit_transform_children(
+              map, maybe_parent->entity, [&](entt::entity child) {
+                  if (lmng::get_name(map, child) == name)
+                      collides = true;
+              });
+
+            if (!collides)
+                break;
+
+            found_name = name + std::to_string(++postfix);
+        }
+
+        return name;
     }
 
-    return unique_name;
+    auto name_view =
+      map.view<lmng::name const>(entt::exclude<lmng::transform_parent>);
+
+    while (ranges::find_if(name_view, [&](auto entity) {
+               return name_view.get(entity).string == found_name;
+           }) != name_view.end())
+    {
+        found_name += std::to_string(++postfix);
+    }
+
+    return found_name;
 }
 
 entt::entity map_editor_controller::add_adjacent(
@@ -116,9 +138,10 @@ entt::entity map_editor_controller::copy_entity(
 {
     auto selected_box = get_selection();
 
-    auto new_name =
-      get_unique_name(map, lmng::get_name(map, selected_box).c_str());
     auto new_box = map.create(selected_box);
+
+    auto new_name =
+      get_unique_name(map, new_box, lmng::get_name(map, selected_box).c_str());
     lmng::reflect_components(
       map, selected_box, [&](lmng::any_component component) {
           component.assign(map, new_box);

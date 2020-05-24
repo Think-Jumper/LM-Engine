@@ -52,6 +52,8 @@ class any_component
     {
     }
 
+    any_component(entt::meta_any const &any) : any{any} {}
+
     char const *name() const
     {
         return any.type()

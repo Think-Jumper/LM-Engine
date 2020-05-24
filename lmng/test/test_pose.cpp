@@ -1,3 +1,4 @@
+#include "hierarchy.h"
 #include <catch2/catch.hpp>
 #include <iostream>
 #include <lmlib/range.h>
@@ -8,30 +9,6 @@
 #include <lmng/transform.h>
 #include <range/v3/algorithm/generate.hpp>
 #include <range/v3/view/zip.hpp>
-
-std::pair<entt::entity, std::array<entt::entity, 4>>
-  create_test_hierarchy(entt::registry &registry)
-{
-    auto parent = registry.create();
-
-    std::array<entt::entity, 4> children{entt::null};
-
-    registry.create(children.begin(), children.end());
-
-    registry.assign<lmng::name>(
-      children.begin(),
-      children.end(),
-      std::array<lmng::name, 4>{"1", "11", "111", "2"}.begin());
-
-    registry.assign<lmng::transform_parent>(
-      children.begin(),
-      children.end(),
-      std::array<lmng::transform_parent, 4>{
-        parent, children[0], children[1], parent}
-        .begin());
-
-    return {parent, children};
-};
 
 TEST_CASE("Save/load pose")
 {

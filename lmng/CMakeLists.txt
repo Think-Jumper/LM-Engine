@@ -53,11 +53,13 @@ add_executable(
   test/test_transform.cpp
   test/test_transform_hierarchy_visit.cpp
   test/test_pose
+  test/test_serialisation.cpp
+  test/hierarchy.cpp
 )
 
 target_link_libraries(
   test_lmng
-  PRIVATE
+  PUBLIC
   Catch2::Catch2
   lmng
 )

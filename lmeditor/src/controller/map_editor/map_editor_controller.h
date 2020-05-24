@@ -63,7 +63,10 @@ class map_editor_controller : public viewport
     entt::entity
       copy_entity(entt::registry &map, Eigen::Vector3f const &direction);
 
-    std::string get_unique_name(entt::registry const &map, char const *prefix);
+    std::string get_unique_name(
+      entt::registry const &map,
+      entt::entity for_entity,
+      const std::string &name);
 
     std::vector<command_description> get_command_descriptions();
 

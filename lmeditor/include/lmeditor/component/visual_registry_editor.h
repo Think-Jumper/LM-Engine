@@ -1,12 +1,35 @@
 #pragma once
 
 #include "component.h"
+#include <bitset>
 #include <entt/fwd.hpp>
 #include <lmeditor/model/orbital_camera.h>
 #include <lmtk/font.h>
 
 namespace lmeditor
 {
+struct visual_registry_editor_capabilities
+{
+    enum class capabilities
+    {
+        add,
+        copy,
+        remove,
+        translate,
+        rotate,
+        n_capabilities
+    };
+
+    void all() { flags.set(); }
+
+    visual_registry_editor_capabilities &add()
+    {
+        flags.set(static_cast<size_t>(capabilities::add));
+    }
+
+    std::bitset<static_cast<size_t>(capabilities::n_capabilities)> flags;
+};
+
 struct visual_registry_editor_init
 {
     entt::registry &registry;
